@@ -88,7 +88,7 @@ export const SmashBrosCharacters = {
   SORA: "SORA",
 } as const;
 
-export type Character =
+export type SmashBrosCharacters =
   (typeof SmashBrosCharacters)[keyof typeof SmashBrosCharacters];
 
 /**
@@ -243,7 +243,7 @@ export const PositionLabel = {
 };
 
 // ベク変の方向
-const Direction = {
+export const Direction = {
   Up: "Up",
   UpperOutside: "Upper Outside",
   Outside: "Outside",
@@ -275,7 +275,7 @@ export const DirectionLabel = {
  */
 export type SsbuTableStatus = {
   id: number;
-  character: Character;
+  character: SmashBrosCharacters;
   move: SmashBrosMoves;
   positionCenter: PositionCenter;
   normalPercentageCenter: number;
