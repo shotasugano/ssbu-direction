@@ -185,6 +185,10 @@ export const SmashBrosCharacterLabels = {
  * 技
  */
 export const SmashBrosMoves = {
+  NEUTRAL_B: "NEUTRAL_B",
+  SIDE_B: "SIDE_B",
+  UP_B: "UP_B",
+  DOWN_B: "DOWN_B",
   JAB: "JAB",
   DASH_ATTACK: "DASH_ATTACK",
   FORWARD_TILT: "FORWARD_TILT",
@@ -193,10 +197,10 @@ export const SmashBrosMoves = {
   FORWARD_SMASH: "FORWARD_SMASH",
   UP_SMASH: "UP_SMASH",
   DOWN_SMASH: "DOWN_SMASH",
-  NEUTRAL_B: "NEUTRAL_B",
-  SIDE_B: "SIDE_B",
-  UP_B: "UP_B",
-  DOWN_B: "DOWN_B",
+  FORWARD_THROW: "FORWARD_THROW",
+  BACK_THROW: "BACK_THROW",
+  UP_THROW: "UP_THROW",
+  DOWN_THROW: "DOWN_THROW",
 } as const;
 
 export type SmashBrosMoves =
@@ -205,18 +209,22 @@ export type SmashBrosMoves =
  * 技ラベル
  */
 export const SmashBrosMoveLabels = {
-  JAB: "弱攻撃",
+  NEUTRAL_B: "NB",
+  SIDE_B: "横B",
+  UP_B: "上B",
+  DOWN_B: "下B",
+  JAB: "弱",
   DASH_ATTACK: "ダッシュ攻撃",
   FORWARD_TILT: "横強",
   UP_TILT: "上強",
   DOWN_TILT: "下強",
-  FORWARD_SMASH: "横スマッシュ",
-  UP_SMASH: "上スマッシュ",
-  DOWN_SMASH: "下スマッシュ",
-  NEUTRAL_B: "通常必殺技",
-  SIDE_B: "横必殺技",
-  UP_B: "上必殺技",
-  DOWN_B: "下必殺技",
+  FORWARD_SMASH: "横スマ",
+  UP_SMASH: "上スマ",
+  DOWN_SMASH: "下スマ",
+  FORWARD_THROW: "前投げ",
+  BACK_THROW: "後ろ投げ",
+  UP_THROW: "上投げ",
+  DOWN_THROW: "下投げ",
 } as const;
 
 /*

@@ -124,8 +124,10 @@ export default function Home() {
             </button>
           </div>
         </form>
-        <div className="mt-1">
+        <div className="mt-5">
           <h3 className="text-lg font-semibold">データ表示</h3>
+          <p className="text-red-600">* 赤 ベスト</p>
+          <p className="text-green-600">* 緑 ベター</p>
           <ResultTable />
         </div>
         <div>作った人</div>

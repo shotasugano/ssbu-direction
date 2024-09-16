@@ -44,12 +44,18 @@ const ResultTable: React.FC = () => {
 
   return (
     <div className="p-4 bg-gray-100 min-h-1">
-      <h4 className="">初期位置</h4>
+      <div className="flex justify-between">
+        <h4 className="">初期位置</h4>
+        <div>
+          <p>備考:</p>
+          <p>{data.length > 0 && data[0].noteCenter}</p>
+        </div>
+      </div>
       <table className="min-w-full bg-white rounded-lg shadow-md">
         <thead>
           <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
             <th className="py-3 px-6 text-left">ベクトル</th>
-            <th className="py-3 px-6 text-left">パーセンテージ</th>
+            <th className="py-3 px-6 text-left">%</th>
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
@@ -92,12 +98,18 @@ const ResultTable: React.FC = () => {
           ))}
         </tbody>
       </table>
-      <h4 className="pt-4">崖端</h4>
+      <div className="flex justify-between pt-4">
+        <h4 className="">崖端</h4>
+        <div>
+          <p>備考:</p>
+          <p>{data.length > 0 && data[0].noteCenter}</p>
+        </div>
+      </div>
       <table className="min-w-full bg-white rounded-lg shadow-md">
         <thead>
           <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
             <th className="py-3 px-6 text-left">ベクトル</th>
-            <th className="py-3 px-6 text-left">パーセンテージ</th>
+            <th className="py-3 px-6 text-left">%</th>
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
