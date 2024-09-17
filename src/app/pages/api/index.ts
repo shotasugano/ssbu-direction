@@ -10,9 +10,20 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { character, move } = req.body;
+
   try {
     // Fetch data from Supabase
-    const { data, error } = await supabase.from("your_table_name").select("*");
+    const { data, error } = await supabase
+      .from("smash_table")
+      .select("*")
+      .eq("character", character)
+      .eq("move", move)
+      .single();
+
+    if (!data) {
+      return res.status(404).json({ error: "Not found" });
+    }
 
     if (error) {
       throw error;

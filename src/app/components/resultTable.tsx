@@ -76,10 +76,10 @@ const ResultTable: React.FC = () => {
                 key={item.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-red-600">
                   {item.correctDirectionCenter}
                 </td>
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-red-600">
                   {item.correctDirectionPercentageCenter}
                 </td>
               </tr>
@@ -87,10 +87,10 @@ const ResultTable: React.FC = () => {
                 key={item.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-green-600">
                   {item.nextCorrectDirectionCenter}
                 </td>
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-green-600">
                   {item.nextCorrectDirectionPercentageCenter}
                 </td>
               </tr>
@@ -130,10 +130,10 @@ const ResultTable: React.FC = () => {
                 key={item.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-red-600">
                   {item.correctDirectionEnd}
                 </td>
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-red-600">
                   {item.correctDirectionPercentageEnd}
                 </td>
               </tr>
@@ -141,10 +141,10 @@ const ResultTable: React.FC = () => {
                 key={item.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-green-600">
                   {item.nextCorrectDirectionEnd}
                 </td>
-                <td className="py-3 px-6 text-left">
+                <td className="py-3 px-6 text-left text-green-600">
                   {item.nextCorrectDirectionPercentageEnd}
                 </td>
               </tr>

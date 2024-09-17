@@ -1,14 +1,16 @@
 "use client";
-import React from "react";
+
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   SmashBrosCharacterLabels,
   SmashBrosMoveLabels,
   SsbuRequest,
 } from "../../utils/type";
-import ResultTable from "./conponents/resultTable";
-import Accordion from "./conponents/Accordion";
+import ResultTable from "./components/resultTable";
+import Accordion from "./components/Accordion";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 // SmashBrosCharacterLabels をオブジェクトから配列に変換
 const SmashBrosCharacterLabelsArray = Object.entries(
@@ -28,9 +30,34 @@ const SmashBrosMoveLabelsArray = Object.entries(SmashBrosMoveLabels).map(
 
 export default function Home() {
   const { register, handleSubmit } = useForm<SsbuRequest>();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  const onSubmit: SubmitHandler<SsbuRequest> = (data: SsbuRequest) => {
-    console.log(data);
+  /**
+   * useEffectでクエリからデータを取得する
+   */
+  useEffect(() => {
+    const character = searchParams.get("character");
+    const move = searchParams.get("move");
+    if (character && move) {
+      // ここでデータを取得する
+
+      console.log(character, move);
+    }
+  }, [searchParams]);
+
+  /**
+   * 確認するボタンを押した時の処理
+   */
+  const onSubmit: SubmitHandler<SsbuRequest> = async (data: SsbuRequest) => {
+    /**
+     * リクエストをクエリパラメーターの形にしてrouter.pushする
+     */
+    const queryParams = new URLSearchParams(data).toString();
+    router.push(`?${queryParams}`);
+    // TODO: クエリパラメーターにしてデータを取得するしかない
+    // const res = await fetch(`${API_URL}/api/${id}`, { cache: "no-cache" });
   };
 
   return (
