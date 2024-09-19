@@ -10,7 +10,8 @@ import ResultTable from "./components/resultTable";
 import Accordion from "./components/Accordion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getMoveList } from "../../utils/getMoveList";
 
 // SmashBrosCharacterLabels をオブジェクトから配列に変換
 const SmashBrosCharacterLabelsArray = Object.entries(
@@ -20,32 +21,52 @@ const SmashBrosCharacterLabelsArray = Object.entries(
   value,
 }));
 
-// SmashBrosMoveLabels をオブジェクトから配列に変換
-const SmashBrosMoveLabelsArray = Object.entries(SmashBrosMoveLabels).map(
-  ([key, value]) => ({
-    key,
-    value,
-  })
-);
-
 export default function Home() {
-  const { register, handleSubmit } = useForm<SsbuRequest>();
+  const { register, handleSubmit, watch } = useForm<SsbuRequest>({
+    defaultValues: {
+      character: undefined,
+      move: undefined,
+    },
+  });
   const router = useRouter();
   const searchParams = useSearchParams();
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  const [resultData, setResultData] = useState<
+    { key: string; value: string }[] | undefined
+  >(undefined);
 
   /**
    * useEffectでクエリからデータを取得する
    */
   useEffect(() => {
-    const character = searchParams.get("character");
-    const move = searchParams.get("move");
-    if (character && move) {
-      // ここでデータを取得する
+    const fetchData = async () => {
+      if (!searchParams) {
+        return;
+      }
+      const character = searchParams.get("character");
+      const move = searchParams.get("move");
+      if (character && move) {
+        try {
+          // クエリパラメータを使用してデータを取得する
+          const res = await fetch(
+            `${API_URL}/api?character=${character}&move=${move}`,
+            {
+              cache: "no-cache",
+            }
+          );
+          const data = await res.json();
+          console.log(data);
+          setResultData(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+        console.log(character, move);
+      }
+    };
 
-      console.log(character, move);
-    }
-  }, [searchParams]);
+    fetchData();
+  }, [API_URL, searchParams, setResultData]);
 
   /**
    * 確認するボタンを押した時の処理
@@ -56,9 +77,27 @@ export default function Home() {
      */
     const queryParams = new URLSearchParams(data).toString();
     router.push(`?${queryParams}`);
-    // TODO: クエリパラメーターにしてデータを取得するしかない
-    // const res = await fetch(`${API_URL}/api/${id}`, { cache: "no-cache" });
   };
+
+  const watchCharacter = watch("character");
+  const [moveList, setMoveList] = useState<{ key: string; value: string }[]>(
+    []
+  );
+
+  /**
+   * watchCharacter が変更された時getMoveList関数を使用して技リストを取得する
+   */
+  useEffect(() => {
+    if (watchCharacter) {
+      const moves = getMoveList(watchCharacter);
+
+      const formattedMoves = moves.map((move) => ({
+        key: move,
+        value: SmashBrosMoveLabels[move as keyof typeof SmashBrosMoveLabels],
+      }));
+      setMoveList(formattedMoves);
+    }
+  }, [watchCharacter]);
 
   return (
     <div className="h-full: height: 100%; bg-gray-100 p-4">
@@ -112,9 +151,12 @@ export default function Home() {
               {...register("character")}
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              {SmashBrosCharacterLabelsArray.map((label) => {
+              <option value="" disabled selected>
+                キャラクター選択
+              </option>
+              {SmashBrosCharacterLabelsArray.map((label, index) => {
                 return (
-                  <option key={label.key} value={label.key}>
+                  <option key={index} value={label.key}>
                     {label.value}
                   </option>
                 );
@@ -133,7 +175,10 @@ export default function Home() {
               {...register("move")}
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              {SmashBrosMoveLabelsArray.map((label) => {
+              <option value="" disabled selected className="whitespace-nowrap">
+                キャラクター選択後、技を選択
+              </option>
+              {moveList.map((label) => {
                 return (
                   <option key={label.key} value={label.key}>
                     {label.value}
@@ -151,12 +196,14 @@ export default function Home() {
             </button>
           </div>
         </form>
-        <div className="mt-5">
-          <h3 className="text-lg font-semibold">データ表示</h3>
-          <p className="text-red-600">* 赤 ベスト</p>
-          <p className="text-green-600">* 緑 ベター</p>
-          <ResultTable />
-        </div>
+        {resultData && (
+          <div className="mt-5">
+            <h3 className="text-lg font-semibold">データ表示</h3>
+            <p className="text-red-600">* 赤 ベスト</p>
+            <p className="text-green-600">* 緑 ベター</p>
+            <ResultTable />
+          </div>
+        )}
         <div>作った人</div>
         <div>あと広告</div>
       </main>

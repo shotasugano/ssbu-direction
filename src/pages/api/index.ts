@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { character, move } = req.body;
+  const { character, move } = req.query;
 
   try {
     // Fetch data from Supabase

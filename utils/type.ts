@@ -230,7 +230,6 @@ export const SmashBrosMoveLabels = {
 /*
  *位置
  */
-
 export const Position = {
   Center: "Center",
   End: "End",
