@@ -44,6 +44,7 @@ export default function Home() {
       if (!searchParams) {
         return;
       }
+      // TODO: 今のままだとなんでも通しちゃうのでバリデーションしたい
       const character = searchParams.get("character");
       const move = searchParams.get("move");
       if (character && move) {
@@ -56,11 +57,13 @@ export default function Home() {
             }
           );
           const data = await res.json();
+          //FIXME: 後で消す
           console.log(data);
           setResultData(data);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
+        //FIXME: 後で消す
         console.log(character, move);
       }
     };
