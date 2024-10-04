@@ -5,6 +5,7 @@ import {
   SmashBrosCharacterLabels,
   SmashBrosMoveLabels,
   SsbuRequest,
+  SsbuTableStatus,
 } from "../../utils/type";
 import ResultTable from "./components/resultTable";
 import Accordion from "./components/Accordion";
@@ -12,6 +13,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getMoveList } from "../../utils/getMoveList";
+import { useDefaultValueByQuery } from "../../utils/useDefaultValueByQuery";
+import { getValidatedQueryParams } from "../../utils/getValidatedQueryParams";
+import { convertSnakeToCamel } from "../../utils/convertSnakeToCamel";
 
 // SmashBrosCharacterLabels をオブジェクトから配列に変換
 const SmashBrosCharacterLabelsArray = Object.entries(
@@ -22,19 +26,19 @@ const SmashBrosCharacterLabelsArray = Object.entries(
 }));
 
 export default function Home() {
+  // TODO: クエリからdefaultValuesを取得する関数を用意する(バリデーション含む)
+  const defaultValues = useDefaultValueByQuery();
+  // const {defaultValues} = useQueryParams();
   const { register, handleSubmit, watch } = useForm<SsbuRequest>({
-    defaultValues: {
-      character: undefined,
-      move: undefined,
-    },
+    defaultValues,
   });
   const router = useRouter();
   const searchParams = useSearchParams();
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  const [resultData, setResultData] = useState<
-    { key: string; value: string }[] | undefined
-  >(undefined);
+  const [resultData, setResultData] = useState<SsbuTableStatus | undefined>(
+    undefined
+  );
 
   /**
    * useEffectでクエリからデータを取得する
@@ -44,28 +48,43 @@ export default function Home() {
       if (!searchParams) {
         return;
       }
-      // TODO: 今のままだとなんでも通しちゃうのでバリデーションしたい
       const character = searchParams.get("character");
       const move = searchParams.get("move");
-      if (character && move) {
-        try {
-          // クエリパラメータを使用してデータを取得する
-          const res = await fetch(
-            `${API_URL}/api?character=${character}&move=${move}`,
-            {
-              cache: "no-cache",
-            }
-          );
-          const data = await res.json();
-          //FIXME: 後で消す
-          console.log(data);
-          setResultData(data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-        //FIXME: 後で消す
-        console.log(character, move);
+      if (character === null || move === null) {
+        return;
       }
+      const requestInput = getValidatedQueryParams(character, move);
+
+      /**
+       * requestInput 内のcharacterかmoveがundefinedの場合は処理を終了する
+       */
+      if (
+        requestInput.character === undefined ||
+        requestInput.move === undefined
+      ) {
+        window.alert("キャラクターか技が不正です");
+        return;
+      }
+
+      try {
+        // クエリパラメータを使用してデータを取得する
+        const res = await fetch(
+          `${API_URL}/api?character=${character}&move=${move}`,
+          {
+            cache: "no-cache",
+          }
+        );
+        const dataInput = await res.json();
+        //FIXME: 後で消す
+        console.log(dataInput);
+        const data = convertSnakeToCamel(dataInput);
+
+        setResultData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+      //FIXME: 後で消す
+      console.log(character, move);
     };
 
     fetchData();
@@ -204,11 +223,18 @@ export default function Home() {
             <h3 className="text-lg font-semibold">データ表示</h3>
             <p className="text-red-600">* 赤 ベスト</p>
             <p className="text-green-600">* 緑 ベター</p>
-            <ResultTable />
+            <ResultTable resultData={resultData} />
           </div>
         )}
-        <div>作った人</div>
-        <div>あと広告</div>
+        <div className="pt-4">
+          <Link
+            href="https://twitter.com/atora_ssbu"
+            className="text-blue-500 hover:text-blue-300"
+          >
+            作った人
+          </Link>
+        </div>
+        <div className="pt-4">あと広告</div>
       </main>
     </div>
   );

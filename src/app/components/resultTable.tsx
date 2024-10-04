@@ -1,54 +1,18 @@
-import React, { useEffect, useState } from "react";
-import {
-  Direction,
-  Position,
-  SmashBrosCharacters,
-  SmashBrosMoves,
-  SsbuTableStatus,
-} from "../../../utils/type";
+import { SsbuTableStatus } from "../../../utils/type";
 
-// サンプルデータ
-const sampleData: SsbuTableStatus[] = [
-  {
-    id: 1,
-    character: SmashBrosCharacters.MARIO,
-    move: SmashBrosMoves.JAB,
-    positionCenter: Position.Center,
-    normalPercentageCenter: 100,
-    correctDirectionCenter: Direction.Up,
-    correctDirectionPercentageCenter: 120,
-    nextCorrectDirectionCenter: Direction.Down,
-    nextCorrectDirectionPercentageCenter: 110,
-    noteCenter: "特になし",
-    positionEnd: Position.End,
-    normalPercentageEnd: 50,
-    correctDirectionEnd: Direction.Up,
-    correctDirectionPercentageEnd: 90,
-    nextCorrectDirectionEnd: Direction.Down,
-    nextCorrectDirectionPercentageEnd: 60,
-    noteEnd: "特になし",
-  },
-];
+type ResultTableProps = {
+  resultData: SsbuTableStatus;
+};
 
-const ResultTable: React.FC = () => {
-  const [data, setData] = useState<SsbuTableStatus[]>([]);
-
-  useEffect(() => {
-    // fetch('API_ENDPOINT')
-    //   .then(response => response.json())
-    //   .then(data => setData(data));
-
-    // デモ用にサンプルデータをセット
-    setData(sampleData);
-  }, []);
-
+const ResultTable = ({ resultData }: ResultTableProps) => {
+  console.log(resultData);
   return (
     <div className="p-4 bg-gray-100 min-h-1">
       <div className="flex justify-between">
         <h4 className="">初期位置</h4>
         <div>
           <p>備考:</p>
-          <p>{data.length > 0 && data[0].noteCenter}</p>
+          <p>{resultData && resultData.noteCenter}</p>
         </div>
       </div>
       <table className="min-w-full bg-white rounded-lg shadow-md">
@@ -59,50 +23,50 @@ const ResultTable: React.FC = () => {
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
-          {data.length > 0 && (
+          {resultData && (
             <tr
               key={"normalCenter"}
               className="border-b border-gray-200 hover:bg-gray-100"
             >
               <td className="py-3 px-6 text-left">無ベク変</td>
               <td className="py-3 px-6 text-left">
-                {data[0].normalPercentageCenter}
+                {resultData.normalPercentageCenter}
               </td>
             </tr>
           )}
-          {data.map((item) => (
+          {
             <>
               <tr
-                key={item.id}
+                key={resultData.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
                 <td className="py-3 px-6 text-left text-red-600">
-                  {item.correctDirectionCenter}
+                  {resultData.correctDirectionCenter}
                 </td>
                 <td className="py-3 px-6 text-left text-red-600">
-                  {item.correctDirectionPercentageCenter}
+                  {resultData.correctDirectionPercentageCenter}
                 </td>
               </tr>
               <tr
-                key={item.id}
+                key={resultData.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
                 <td className="py-3 px-6 text-left text-green-600">
-                  {item.nextCorrectDirectionCenter}
+                  {resultData.nextCorrectDirectionCenter}
                 </td>
                 <td className="py-3 px-6 text-left text-green-600">
-                  {item.nextCorrectDirectionPercentageCenter}
+                  {resultData.nextCorrectDirectionPercentageCenter}
                 </td>
               </tr>
             </>
-          ))}
+          }
         </tbody>
       </table>
       <div className="flex justify-between pt-4">
         <h4 className="">崖端</h4>
         <div>
           <p>備考:</p>
-          <p>{data.length > 0 && data[0].noteCenter}</p>
+          <p>{resultData.noteCenter}</p>
         </div>
       </div>
       <table className="min-w-full bg-white rounded-lg shadow-md">
@@ -113,43 +77,43 @@ const ResultTable: React.FC = () => {
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
-          {data.length > 0 && (
+          {
             <tr
               key={"normalCenter"}
               className="border-b border-gray-200 hover:bg-gray-100"
             >
               <td className="py-3 px-6 text-left">無ベク変</td>
               <td className="py-3 px-6 text-left">
-                {data[0].normalPercentageEnd}
+                {resultData.normalPercentageEnd}
               </td>
             </tr>
-          )}
-          {data.map((item) => (
+          }
+          {
             <>
               <tr
-                key={item.id}
+                key={resultData.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
                 <td className="py-3 px-6 text-left text-red-600">
-                  {item.correctDirectionEnd}
+                  {resultData.correctDirectionEnd}
                 </td>
                 <td className="py-3 px-6 text-left text-red-600">
-                  {item.correctDirectionPercentageEnd}
+                  {resultData.correctDirectionPercentageEnd}
                 </td>
               </tr>
               <tr
-                key={item.id}
+                key={resultData.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
               >
                 <td className="py-3 px-6 text-left text-green-600">
-                  {item.nextCorrectDirectionEnd}
+                  {resultData.nextCorrectDirectionEnd}
                 </td>
                 <td className="py-3 px-6 text-left text-green-600">
-                  {item.nextCorrectDirectionPercentageEnd}
+                  {resultData.nextCorrectDirectionPercentageEnd}
                 </td>
               </tr>
             </>
-          ))}
+          }
         </tbody>
       </table>
     </div>

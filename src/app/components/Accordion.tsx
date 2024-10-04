@@ -7,7 +7,11 @@ interface AccordionProps {
 
 const Accordion = ({ title, children }: AccordionProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const toggleAccordion = () => {
+  const toggleAccordion = (event: React.MouseEvent) => {
+    /**
+     * form内にボタンとして存在するためonSubmitが誤送信されるのを防ぐ
+     */
+    event.preventDefault();
     setIsOpen(!isOpen);
   };
 
