@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import {
   SmashBrosCharacterLabels,
   SmashBrosMoveLabels,
+  SmashBrosMoves,
   SsbuRequest,
   SsbuTableStatus,
 } from "../../utils/type";
@@ -16,6 +17,9 @@ import { getMoveList } from "../../utils/getMoveList";
 import { useDefaultValueByQuery } from "../../utils/useDefaultValueByQuery";
 import { getValidatedQueryParams } from "../../utils/getValidatedQueryParams";
 import { convertSnakeToCamel } from "../../utils/convertSnakeToCamel";
+import ErrorMessage from "./components/ErrorMessage";
+import { useRecoilState } from "recoil";
+import { errorMessageState } from "../../state/errorMessageState";
 
 // SmashBrosCharacterLabels をオブジェクトから配列に変換
 const SmashBrosCharacterLabelsArray = Object.entries(
@@ -28,9 +32,10 @@ const SmashBrosCharacterLabelsArray = Object.entries(
 export default function Home() {
   // TODO: クエリからdefaultValuesを取得する関数を用意する(バリデーション含む)
   const defaultValues = useDefaultValueByQuery();
-  // const {defaultValues} = useQueryParams();
-  const { register, handleSubmit, watch } = useForm<SsbuRequest>({
-    defaultValues,
+  // FIXME: 後で消す
+  console.log(defaultValues);
+  const { register, handleSubmit, watch, setValue } = useForm<SsbuRequest>({
+    defaultValues: defaultValues,
   });
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,7 +44,28 @@ export default function Home() {
   const [resultData, setResultData] = useState<SsbuTableStatus | undefined>(
     undefined
   );
+  const [errorMessage, setErrorMessage] = useRecoilState(errorMessageState);
+  console.log(errorMessage);
 
+  const watchCharacter = watch("character");
+  const [moveList, setMoveList] = useState<{ key: string; value: string }[]>(
+    []
+  );
+
+  /**
+   * watchCharacter が変更された時getMoveList関数を使用して技リストを取得する
+   */
+  useEffect(() => {
+    if (watchCharacter) {
+      const moves = getMoveList(watchCharacter);
+
+      const formattedMoves = moves.map((move) => ({
+        key: move,
+        value: SmashBrosMoveLabels[move as keyof typeof SmashBrosMoveLabels],
+      }));
+      setMoveList(formattedMoves);
+    }
+  }, [watchCharacter, setValue, defaultValues.move]);
   /**
    * useEffectでクエリからデータを取得する
    */
@@ -74,12 +100,18 @@ export default function Home() {
             cache: "no-cache",
           }
         );
+        if (res.status === 404) {
+          setErrorMessage("データが見つかりませんでした");
+          return;
+        }
         const dataInput = await res.json();
         //FIXME: 後で消す
         console.log(dataInput);
+
         const data = convertSnakeToCamel(dataInput);
 
         setResultData(data);
+        setValue("move", defaultValues.move as SmashBrosMoves);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -88,12 +120,21 @@ export default function Home() {
     };
 
     fetchData();
-  }, [API_URL, searchParams, setResultData]);
+  }, [
+    API_URL,
+    defaultValues.move,
+    searchParams,
+    setErrorMessage,
+    setResultData,
+    setValue,
+  ]);
 
   /**
    * 確認するボタンを押した時の処理
    */
-  const onSubmit: SubmitHandler<SsbuRequest> = async (data: SsbuRequest) => {
+  const onSubmit: SubmitHandler<SsbuRequest> = (data: SsbuRequest) => {
+    setResultData(undefined);
+    setErrorMessage(null);
     /**
      * リクエストをクエリパラメーターの形にしてrouter.pushする
      */
@@ -101,25 +142,14 @@ export default function Home() {
     router.push(`?${queryParams}`);
   };
 
-  const watchCharacter = watch("character");
-  const [moveList, setMoveList] = useState<{ key: string; value: string }[]>(
-    []
-  );
-
-  /**
-   * watchCharacter が変更された時getMoveList関数を使用して技リストを取得する
-   */
-  useEffect(() => {
-    if (watchCharacter) {
-      const moves = getMoveList(watchCharacter);
-
-      const formattedMoves = moves.map((move) => ({
-        key: move,
-        value: SmashBrosMoveLabels[move as keyof typeof SmashBrosMoveLabels],
-      }));
-      setMoveList(formattedMoves);
-    }
-  }, [watchCharacter]);
+  if (defaultValues.move !== undefined) {
+    /**
+     * 技にdefaultvalueを再設定するがなぜかsetValueがうまくいかないので一旦コメントアウトしたい
+     */
+    setValue("move", defaultValues.move as SmashBrosMoves);
+    //FIXME: 後で消す
+    console.log("動いてます", defaultValues.move);
+  }
 
   return (
     <div className="h-full: height: 100%; bg-gray-100 p-4">
@@ -173,7 +203,7 @@ export default function Home() {
               {...register("character")}
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 キャラクター選択
               </option>
               {SmashBrosCharacterLabelsArray.map((label, index) => {
@@ -197,7 +227,7 @@ export default function Home() {
               {...register("move")}
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="" disabled selected className="whitespace-nowrap">
+              <option value="" disabled className="whitespace-nowrap">
                 キャラクター選択後、技を選択
               </option>
               {moveList.map((label) => {
@@ -209,6 +239,7 @@ export default function Home() {
               })}
             </select>
           </div>
+
           <div className="flex justify-center pt-4">
             <button
               type="submit"
@@ -218,6 +249,7 @@ export default function Home() {
             </button>
           </div>
         </form>
+        <ErrorMessage errorMessage={errorMessage} />
         {resultData && (
           <div className="mt-5">
             <h3 className="text-lg font-semibold">データ表示</h3>

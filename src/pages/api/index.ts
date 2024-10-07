@@ -21,21 +21,23 @@ export default async function handler(
       .eq("move", move)
       .single();
 
-    if (!data) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
     if (error) {
-      throw error;
+      if (error.code === "PGRST404") {
+        return res
+          .status(404)
+          .json({ error: "ごめんなさい、データが見つかりませんでした" });
+      }
+    }
+    if (!data) {
+      return res
+        .status(404)
+        .json({ error: "ごめんなさい、データが見つかりませんでした" });
     }
 
     // Return the fetched data
     res.status(200).json(data);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: "An unknown error occurred" });
-    }
+  } catch (error: unknown) {
+    res.status(500).json({ error: "An unknown error occurred" });
+    console.error(error);
   }
 }

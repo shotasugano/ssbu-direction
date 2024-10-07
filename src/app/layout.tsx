@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import localFont from "next/font/local";
 import "./globals.css";
+import { RecoilRoot } from "recoil";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,22 +15,17 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "あとライブラリ",
-  description: "ベク変の正解ライブラリです",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <RecoilRoot>{children}</RecoilRoot>
       </body>
     </html>
   );
