@@ -306,6 +306,14 @@ export type SsbuTableStatus = {
 export type SsbuRequest = Pick<SsbuTableStatus, "character" | "move">;
 
 /**
+ * リクエストの型定義
+ */
+export type SsbuRequestInput = {
+  character: SmashBrosCharacters | "";
+  move: SmashBrosMoves | "";
+};
+
+/**
  * レスポンスの型定義
  */
 export type SsbuResponse = SsbuTableStatus;

@@ -1,11 +1,12 @@
 "use client";
 
-import { SubmitHandler, useForm } from "react-hook-form";
+import { set, SubmitHandler, useForm } from "react-hook-form";
 import {
   SmashBrosCharacterLabels,
   SmashBrosMoveLabels,
   SmashBrosMoves,
   SsbuRequest,
+  SsbuRequestInput,
   SsbuTableStatus,
 } from "../../utils/type";
 import ResultTable from "./components/resultTable";
@@ -32,11 +33,11 @@ const SmashBrosCharacterLabelsArray = Object.entries(
 export default function Home() {
   // TODO: クエリからdefaultValuesを取得する関数を用意する(バリデーション含む)
   const defaultValues = useDefaultValueByQuery();
-  // FIXME: 後で消す
-  console.log(defaultValues);
-  const { register, handleSubmit, watch, setValue } = useForm<SsbuRequest>({
-    defaultValues: defaultValues,
-  });
+  const { register, handleSubmit, watch, setValue } = useForm<SsbuRequestInput>(
+    {
+      defaultValues: defaultValues,
+    }
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -45,7 +46,6 @@ export default function Home() {
     undefined
   );
   const [errorMessage, setErrorMessage] = useRecoilState(errorMessageState);
-  console.log(errorMessage);
 
   const watchCharacter = watch("character");
   const [moveList, setMoveList] = useState<{ key: string; value: string }[]>(
@@ -64,6 +64,7 @@ export default function Home() {
         value: SmashBrosMoveLabels[move as keyof typeof SmashBrosMoveLabels],
       }));
       setMoveList(formattedMoves);
+      setValue("move", "");
     }
   }, [watchCharacter, setValue, defaultValues.move]);
   /**
@@ -79,6 +80,7 @@ export default function Home() {
       if (character === null || move === null) {
         return;
       }
+
       const requestInput = getValidatedQueryParams(character, move);
 
       /**
@@ -105,18 +107,13 @@ export default function Home() {
           return;
         }
         const dataInput = await res.json();
-        //FIXME: 後で消す
-        console.log(dataInput);
 
         const data = convertSnakeToCamel(dataInput);
 
         setResultData(data);
-        setValue("move", defaultValues.move as SmashBrosMoves);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        throw new Error("データの取得に失敗しました");
       }
-      //FIXME: 後で消す
-      console.log(character, move);
     };
 
     fetchData();
@@ -126,29 +123,28 @@ export default function Home() {
     searchParams,
     setErrorMessage,
     setResultData,
-    setValue,
   ]);
 
   /**
    * 確認するボタンを押した時の処理
    */
-  const onSubmit: SubmitHandler<SsbuRequest> = (data: SsbuRequest) => {
+  const onSubmit: SubmitHandler<SsbuRequestInput> = (
+    data: SsbuRequestInput
+  ) => {
     setResultData(undefined);
     setErrorMessage(null);
     /**
      * リクエストをクエリパラメーターの形にしてrouter.pushする
      */
     const queryParams = new URLSearchParams(data).toString();
-    router.push(`?${queryParams}`);
+    router.replace(`?${queryParams}`);
   };
 
   if (defaultValues.move !== undefined) {
-    /**
-     * 技にdefaultvalueを再設定するがなぜかsetValueがうまくいかないので一旦コメントアウトしたい
-     */
-    setValue("move", defaultValues.move as SmashBrosMoves);
-    //FIXME: 後で消す
-    console.log("動いてます", defaultValues.move);
+    if (moveList.some((move) => move.key === defaultValues.move)) {
+      // useEffectでもsetValueをしているが反映されないので二重で実装している
+      setValue("move", defaultValues.move as SmashBrosMoves);
+    }
   }
 
   return (
@@ -178,9 +174,9 @@ export default function Home() {
                 撃墜技だけど優先順位低くていいかなと思ったものは調べてません。リクエストあれば修正、追加します！
               </li>
               <li>
-                他の技も調べたい場合、もっと詳しい説明をみたい場合は
+                他の技も調べたい場合は
                 <Link
-                  href="https://twitter.com/akaritakaki"
+                  href="https://twitter.com/atora_ssbu"
                   target="_blank"
                   rel="noreferrer"
                   className="text-indigo-600 underline"
@@ -203,7 +199,7 @@ export default function Home() {
               {...register("character")}
               className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              <option value="" disabled>
+              <option value="" disabled selected>
                 キャラクター選択
               </option>
               {SmashBrosCharacterLabelsArray.map((label, index) => {
