@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  basePath: process.env.NODE_ENV === "production" ? "" : undefined,
+  basePath:
+    process.env.NODE_ENV === "production" ? "/ssbu-direction" : undefined,
   distDir: "docs",
   experimental: {
     appDir: true,
