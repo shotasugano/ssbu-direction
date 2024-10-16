@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import PageComponent from "./components/PageComponent";
 
-export const dynamic = "force-static";
+export const dynamic = "auto";
 // 'auto' | 'force-dynamic' | 'force-static' | 'error'
 
 export default function Home() {
