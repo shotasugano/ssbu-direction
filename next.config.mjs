@@ -9,7 +9,6 @@ const nextConfig = {
     process.env.NODE_ENV === "production" ? "/ssbu-direction" : undefined,
   distDir: "docs",
   appDir: true,
-  reactStrictMode: true,
 };
 
 export default nextConfig;
