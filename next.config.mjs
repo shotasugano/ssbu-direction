@@ -7,8 +7,6 @@ const nextConfig = {
   // build時にssbu-directionがassetPrefixになるのでローカルでbuild、検証したいときはコメントアウトする.
   assetPrefix:
     process.env.NODE_ENV === "production" ? "/ssbu-direction" : undefined,
-  distDir: "docs",
-  appDir: true,
 };
 
 export default nextConfig;

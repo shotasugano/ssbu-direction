@@ -6,7 +6,7 @@
     "dev": "next dev -p 4000",
     "build": "next build",
     "start": "npx serve@latest docs -p 4000",
-    "postbuild": "echo > docs/.nojekyll",
+    "postbuild": "cp -r out/* docs/ && echo > docs/.nojekyll",
     "lint": "next lint"
   },
   "dependencies": {
