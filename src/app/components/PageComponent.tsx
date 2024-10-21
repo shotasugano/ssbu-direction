@@ -18,6 +18,7 @@ import {
   SmashBrosCharacterLabels,
 } from "../../../utils/type";
 import { useDefaultValueByQuery } from "../../../utils/useDefaultValueByQuery";
+import { supabase } from "../../../utils/supabaseClient";
 
 // SmashBrosCharacterLabels をオブジェクトから配列に変換
 const SmashBrosCharacterLabelsArray = Object.entries(
@@ -90,20 +91,20 @@ const PageComponent = () => {
         window.alert("キャラクターか技が不正です");
         return;
       }
-
       try {
         // クエリパラメータを使用してデータを取得する
-        const res = await fetch(
-          `${API_URL}/api?character=${character}&move=${move}`,
-          {
-            cache: "no-cache",
-          }
-        );
-        if (res.status === 404) {
+        const { data: res, error } = await supabase
+          .from("smash_table")
+          .select("*")
+          .eq("character", character)
+          .eq("move", move)
+          .single();
+
+        if (error) {
           setErrorMessage("データが見つかりませんでした");
           return;
         }
-        const dataInput = await res.json();
+        const dataInput = res;
 
         const data = convertSnakeToCamel(dataInput);
 
