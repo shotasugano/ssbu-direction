@@ -5,7 +5,6 @@ type ResultTableProps = {
 };
 
 const ResultTable = ({ resultData }: ResultTableProps) => {
-  console.log(resultData);
   return (
     <div className="p-4 bg-gray-100 min-h-1">
       <div className="flex justify-between">
